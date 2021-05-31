@@ -19,7 +19,7 @@ func randomString(n int) string {
 	return string(b)
 }
 
-func DoBenchmarks(f func(s string, chunkSize int) []string) {
+func DoBenchmarks(b *testing.B, f func(s string, chunkSize int) []string) {
 	f(s1, 10)
 	f(s2, 10)
 	f(s3, 10)
@@ -31,30 +31,37 @@ func DoBenchmarks(f func(s string, chunkSize int) []string) {
 	f(s3, 1000)
 }
 
-func Benchmark1(b *testing.B) {
+func BenchmarkChunks(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		DoBenchmarks(Chunks)
+		DoBenchmarks(b, Chunks)
 	}
 	b.ReportAllocs()
 }
 
-func Benchmark2(b *testing.B) {
+func BenchmarkSplitSubN(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		DoBenchmarks(SplitSubN)
+		DoBenchmarks(b, SplitSubN)
 	}
 	b.ReportAllocs()
 }
 
-func Benchmark3(b *testing.B) {
+func BenchmarkChunkString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		DoBenchmarks(ChunkString)
+		DoBenchmarks(b, ChunkString)
 	}
 	b.ReportAllocs()
 }
 
-func Benchmark4(b *testing.B) {
+func BenchmarkChunkStringImproved(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		DoBenchmarks(ChunkStringImproved)
+		DoBenchmarks(b, ChunkStringImproved)
+	}
+	b.ReportAllocs()
+}
+
+func BenchmarkBuild(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		DoBenchmarks(b, Build)
 	}
 	b.ReportAllocs()
 }
@@ -67,6 +74,9 @@ func TestEquality(t *testing.T) {
 		t.Error()
 	}
 	if !reflect.DeepEqual(ChunkStringImproved(s3, 100), Chunks(s3, 100)) {
+		t.Error()
+	}
+	if !reflect.DeepEqual(Build(s3, 100), Chunks(s3, 100)) {
 		t.Error()
 	}
 }

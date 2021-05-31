@@ -1,6 +1,9 @@
 package chunks
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 func Chunks(s string, chunkSize int) []string {
 	if chunkSize >= len(s) {
@@ -71,5 +74,29 @@ func ChunkStringImproved(s string, chunkSize int) []string {
 		chunks[i] = string(runes[i*chunkSize : (i+1)*chunkSize])
 	}
 	chunks[n-1] = string(runes[(n-1)*chunkSize : len(runes)])
+	return chunks
+}
+
+func Build(s string, chunkSize int) []string {
+	if chunkSize >= len(s) {
+		return []string{s}
+	}
+	var chunks []string
+	var b strings.Builder
+	b.Grow(chunkSize)
+	l := 0
+	for _, r := range s {
+		b.WriteRune(r)
+		l++
+		if l == chunkSize {
+			chunks = append(chunks, b.String())
+			l = 0
+			b.Reset()
+			b.Grow(chunkSize)
+		}
+	}
+	if l > 0 {
+		chunks = append(chunks, b.String())
+	}
 	return chunks
 }
